@@ -14,7 +14,7 @@ Use this order when guidance conflicts:
 1. Explicit user instruction in current chat
 2. Local project rules in `.cursor/rules/*.mdc`
 3. This skill
-4. Local docs in `docs/*`
+4. Local docs in `docs/*` (coding standards in `docs/engineering/coding-standards/` take priority over this skill)
 5. Generic external skills
 
 If external skills conflict with this skill or local docs, follow this repository's standards.
@@ -30,7 +30,7 @@ If external skills conflict with this skill or local docs, follow this repositor
 
 ## Architecture and file placement
 
-- Follow `docs/foundation/directory-structure.md`.
+- Follow `docs/engineering/codebase/foundation/directory-structure.md`.
 - Use technical layer first, then feature grouping.
 - Use these locations:
   - Queries: `src/hooks/queries/*`
@@ -81,7 +81,7 @@ If external skills conflict with this skill or local docs, follow this repositor
 
 ## Form conventions (repo-specific)
 
-- Follow `docs/ui/form.md` and existing wrappers under `src/components/ui/form/*`.
+- Follow `docs/engineering/codebase/ui/form.md` and existing wrappers under `src/components/ui/form/*`.
 - Use React Hook Form + Zod resolver patterns already used in repo.
 - For forms with more than two fields, default to RHF.
 - Show field-level errors and use meaningful validation messages.
@@ -131,7 +131,7 @@ Repository-specific auth policy:
 - Run `pnpm lint`, `pnpm typecheck`, and formatting checks for meaningful edits.
 - Validate loading, error, empty, and success states for UI work.
 - Confirm auth and permission paths for backend-sensitive changes.
-- Include manual verification steps aligned with `docs/team/qa-and-acceptance-criteria.md`.
+- Include manual verification steps aligned with `docs/engineering/codebase/team/qa-and-acceptance-criteria.md`.
 
 ## Curated additions from external skills
 

@@ -1,4 +1,6 @@
-## Next.js Supabase React-Query Boilerplate — Developer Onboarding Index
+## Codebase guides (from the Next.js + Supabase boilerplate)
+
+> These guides describe the boilerplate this repo started from. Coding standards in [../coding-standards/](../coding-standards/README.md) take priority over them. Supabase-specific guides depend on decision D-07 (see product/03-decisions-and-questions.md).
 
 Read these documents in order. This file provides a brief overview and links to detailed guides.
 
@@ -7,7 +9,7 @@ Read these documents in order. This file provides a brief overview and links to 
 - Overview (this file)
 - Repository `README.md` for stack summary and quick start
 - Canonical agent implementation standard:
-  - [`.cursor/skills/boilerplate-project-standards/SKILL.md`](../.cursor/skills/boilerplate-project-standards/SKILL.md)
+  - [`.cursor/skills/boilerplate-project-standards/SKILL.md`](../../../.cursor/skills/boilerplate-project-standards/SKILL.md)
 
 ### 2) Prerequisites
 
