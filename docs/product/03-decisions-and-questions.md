@@ -68,3 +68,6 @@ Confirm the user-facing promises P1–P9 ([06 Privacy](../engineering/architectu
 2. **Model shortlist eval**: 100 questions, EN and DE, quality bar set before cost.
 3. **Egress-deny proof** on Compose. Ollama confirmed private with no cloud models.
 4. **Policy engine skeleton** plus the first 10 access test cases. They run in CI from day one.
+
+### D-18 to D-21. Hosting for customers without servers: `OPEN`
+See [07 Hosting and data isolation §8](../engineering/architecture/07-hosting-and-data-isolation.md): first provider (lean: Hetzner dedicated GPU), who owns the account (lean: customer), a no-GPU "lite cell" tier (lean: yes), and Supabase's role (lean: internal tools only).

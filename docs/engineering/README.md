@@ -4,12 +4,14 @@
 
 | # | Doc | Covers |
 |---|-----|--------|
+| **00** | **[Overview: start here](./architecture/00-overview.md)** | **Plain-language picture and step-by-step flows** |
 | 01 | [System architecture](./architecture/01-system-architecture.md) | Cells, components, the life of a question, data, personas, models, scaling |
 | 02 | [Security architecture](./architecture/02-security-architecture.md) | Trust boundaries, the three gates, threat model (incl. MCP threats T14–T20) |
 | 03 | [Integrations and MCP](./architecture/03-integrations-and-mcp.md) | Native, MCP, and hybrid adapters, MCP gateway and tool broker, tool lifecycle, per-call authorization, adding PM tools |
 | 04 | [Deployment](./architecture/04-deployment.md) | `local`, `private-cloud`, `managed` profiles. Release, install, upgrade. Sizing |
 | 05 | [Feature control and customization](./architecture/05-feature-control-and-customization.md) | Layered restriction, feature registry, kill switches, customization levels, Cedar policies |
 | 06 | [Privacy-first architecture](./architecture/06-privacy-architecture.md) | **MUST.** Promises P1–P9 with mechanism and proof. Data inventory as code |
+| 07 | [Hosting and data isolation](./architecture/07-hosting-and-data-isolation.md) | Customers without servers: dedicated server vs AWS vs DigitalOcean vs Supabase. How each customer's DB is kept separate |
 
 ## Other
 

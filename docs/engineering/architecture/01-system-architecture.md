@@ -46,6 +46,8 @@ Why this scales safely:
 - **Compliance is easier.** Data residency is a property of where you put the cell.
 - **Cost:** a cell is roughly €214/month (1× 24 GB GPU) for ~10 Owners. That's fine for B2B pricing.
 
+New here? Read [00 Overview](./00-overview.md) first.
+
 Local and cloud deployment profiles (`local`, `private-cloud`, `managed`) are detailed in **[04 Deployment](./04-deployment.md)**. The privacy promises that every profile must keep are in **[06 Privacy-first architecture](./06-privacy-architecture.md)**.
 
 The trade-off: a fleet of many small installs is harder to operate than one SaaS. That's why the v2 control plane matters, and why "install in < 1 h" (NFR-03) is an architecture requirement, not a docs task.
