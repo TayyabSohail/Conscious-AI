@@ -3,8 +3,8 @@
 Kanwal (working name): a private, self-hosted assistant for project managers. **Security and correct execution are the top priority, always.**
 
 ## Read first
-- Product (what and why): `docs/product/`. Requirements have IDs (`FR-`, `SEC-`, …) and decisions have `D-` IDs.
-- Engineering (how): `docs/engineering/`, covering architecture, coding standards, and codebase guides.
+- Product: `docs/product/PRD.md` (IDs `FR-`, `PLT-`, `NFR-`, `SEC-`) and `docs/product/decisions.md` (`D-` IDs).
+- Architecture: `docs/engineering/architecture.md`.
 - Coding standards: use the `coding-standards` skill (`.claude/skills/coding-standards/`). It points to `docs/engineering/coding-standards/`.
 
 ## Hard rules
