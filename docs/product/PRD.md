@@ -20,7 +20,7 @@ A private assistant that **answers colleagues' questions in place of the PM**. I
 5. **Permissions are inherited, never invented.** Kanwal mirrors company access. The PM can only narrow it.
 6. **Show your work.** Every answer has sources. Every action is logged and visible to the PM.
 7. **Cheapest path that's correct.** Script → basic model → high-performance model → the PM.
-8. **When in doubt, do less.** Unclear sources mean the question goes to the PM.
+8. **Never guess. Never speak for the PM.** If the sources don't state the answer plainly, Kanwal says **"I don't know, please contact \<PM\>"**. It never predicts the PM's opinion, decision, priority, or commitment. Every reply says Kanwal is not 100% accurate.
 9. **Measure before you add.** Every feature ships with its metric.
 
 ## 3. Roles
@@ -55,6 +55,7 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 | FR-02 | **Think it through**: private chat for the PM, with sources, streamed, with an off-the-record mode | MUST | Streams with citations. Off the record writes nothing | Drafts accepted |
 | FR-03 | **Cover mode**: colleagues ask while the PM is busy or away. Kanwal replies **in the channel they asked in** | MUST | Correct outcome: answer / hold / pass to PM | Answered without PM; wait |
 | FR-04 | **Answer ladder**: Tier 0 script/lookup → Tier 1 basic model → Tier 2 high-performance model → Tier 3 PM. Escalates automatically when a tier fails its checks | MUST | Every answer records its tier. Failed checks escalate, never send | % per tier; tokens/answer |
+| FR-28 | **No-guess rule**: (1) questions needing the PM's judgment are never answered by Kanwal; (2) an answer is sent only if every claim is stated in a permitted source; (3) otherwise a **fixed, code-generated** reply "I don't know. Please contact &lt;PM&gt;", plus optional *Suggested sources (not verified)*: links and verbatim excerpts only, never generated text; (4) **every** reply carries "Kanwal can be wrong. It is not 100% accurate. Check the sources or ask &lt;PM&gt;." | MUST | 0 answers without a supporting source in the eval. Every "unknown" case gets the fixed reply | Abstention rate; wrong-answer rate |
 | FR-05 | **LLM provider choice**: built-in local open models (default), **the customer's own API key** (Anthropic Claude, OpenAI GPT), or our hosted models (managed). Set by IT, optionally per project | MUST | Provider switch with no code change. External use is visible to the PM and IT | Cost/answer per provider |
 | FR-06 | **Ground rules and sharing picker**: per project or space, *what* (tickets, pages, decisions, files, Slack channels), *who* (team / group / people / everyone), *how* (just answer · check with me · always me · off). Presets and "Preview as \<person\>" | MUST | Instant, logged, undoable | Coverage; leaks = 0 |
 | FR-07 | **Approval queue**: "check with me" drafts wait for the PM: approve / edit / decline | MUST | Nothing sent without approval | Approved without edits |
@@ -110,12 +111,15 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 | Any check fails or errors | Nothing sent · generic reply · goes to **Unanswered** |
 | Item restricted for the asker | Refusal that never reveals the item exists |
 | `always_me` / `off` | Goes to **Unanswered**. Asker told "That one's Sara's call" |
-| No tier passes its checks | Goes to **Unanswered**. "The docs don't say. I've asked Sara." |
+| No tier passes its checks, or the sources don't state it plainly | Fixed reply: **"I don't know. Please contact Sara. I've let her know you asked."** Optionally adds **Suggested sources (not verified)**. Goes to **Unanswered** |
+| The question needs the PM's judgment (opinion, decision, priority, approval, a commitment or date not in the sources) | Never answered by Kanwal, even if a model could "guess". Same fixed reply. Goes to **Unanswered** |
 | `check_with_me` | Goes to **Needs approval** |
 | `just_answer` + checks pass | Sent with sources and AI label · goes to **Answered** |
 | Asker flags / PM marks incorrect | Goes to **Flagged** → correction → optionally re-sent |
 
 **External LLM rule.** Content goes to an external LLM (BYO key) **only if** IT enabled that provider **and** the project isn't marked `local-only` **and** the profile allows it. The PM and IT see "AI runs at \<provider\>" on every such answer.
+
+**Never speak for the PM.** Kanwal never says what the PM thinks, wants, decided, or would approve unless the PM wrote it in a source. It never invents dates, owners, numbers, or statuses. Replies are phrased "According to &lt;source&gt;: …", never "Sara says …" (except a PM reply the PM actually wrote).
 
 **Agency.** v0 reads, drafts, and answers. No email sends, ticket edits, or permission changes. Document and tool content never triggers an action.
 
@@ -134,6 +138,8 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 | Sent to Bullah Labs | Nothing | Opt-in anonymous totals | IT |
 
 **Metrics.** Only finished events count (an answer sent and not marked wrong, a draft accepted). The PM sets the minutes per event (default 6 min per covered question). Wait time and wrong-answer rate sit beside every estimate. Events carry **no text**. Admins see totals only for groups ≥ 5. No rankings.
+
+**Accuracy notice.** Every reply to an asker (Slack, web, any channel) ends with: *"Kanwal can be wrong. It is not 100% accurate. Check the sources or ask &lt;PM&gt;."* The setup screen and the PM review inbox say the same. It can't be turned off.
 
 **Voice.** The PM is the hero ("Your call", "I drafted, you approve"). At most one light line per screen, and no jokes in errors, permissions, deletes, or security. Use PM words, never "agent/embedding/routing". "I'm not sure" beats a guess. Every answer carries the AI label (AI Act Art. 50). All copy goes through i18n.
 

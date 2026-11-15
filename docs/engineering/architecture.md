@@ -90,16 +90,23 @@ Example: Jonas asks in Slack, *"When is Release 3.4 due, and is anything blockin
  4  GATE 3 · IT policy: Kanwal not paused · source allowed · asker's group allowed
  5  GATE 2 · Sara's sharing rule for this project ──► off / always_me ─────────────► UNANSWERED (tell Jonas)
  6  Load thread context (previous turns in this thread, within retention)
- 7  ANSWER LADDER (§4): Tier 0 → Tier 1 → Tier 2. Each tier:
+ 7  ANSWERABILITY (§4.1): does this need Sara's judgment (opinion, decision, priority, approval,
+    a commitment not in the sources)? ── yes ─► DONT_KNOW reply (step 10b) · never sent to a model to "guess"
+ 8  ANSWER LADDER (§4): Tier 0 → Tier 1 → Tier 2. Each tier:
        a. retrieve candidates (index or connector, filtered to the allowed scope)
        b. GATE 1 · live ACL: can JONAS open each source? (his own token) · error ⇒ STOP
-       c. produce an answer (script or model, sources passed as quoted data)
-       d. checks: grounded? cites ⊆ permitted? within length? confidence ≥ threshold?
-       e. pass → go to 8 · fail → next tier · all fail → UNANSWERED
- 8  Pre-send re-check: ACL again (permissions may have changed) · render as plain text
- 9  Sara's mode = check_with_me ─► NEEDS_APPROVAL (Sara approves / edits / declines)
-10  SEND to Jonas in the same Slack thread: answer + sources + "From Kanwal on Sara's behalf"
-    + [👍 Correct] [This is wrong] buttons                                     state = ANSWERED
+       c. produce an answer (script or model, sources passed as quoted data).
+          The model must return {status: answered | unknown, claims[] each tied to a passage}
+       d. checks: every claim supported verbatim/entailed by a cited passage? cites ⊆ permitted?
+          confidence ≥ threshold? model said "unknown"? ⇒ treat as unknown (never retried into a guess)
+       e. pass → go to 9 · fail → next tier · all fail or unknown → DONT_KNOW (step 10b)
+ 9  Pre-send re-check: ACL again (permissions may have changed) · render as plain text
+    Sara's mode = check_with_me ─► NEEDS_APPROVAL (Sara approves / edits / declines)
+10a SEND to Jonas in the same Slack thread: "According to <source>: …" + sources
+    + "From Kanwal, Sara's assistant" + ACCURACY NOTICE + [👍 Correct] [This is wrong]  state = ANSWERED
+10b DONT_KNOW: a FIXED reply built by code (no model text): "I don't know. Please contact Sara.
+    I've let her know you asked." + optional SUGGESTED SOURCES (not verified) + ACCURACY NOTICE
+    → question goes to Sara's Unanswered view                                  state = UNANSWERED
 11  Persist: Q&A + context (encrypted, retention) · audit entry (hash-chained) · event (no text)
 12  Sara's review inbox updates in real time (§6). Asker flag → FLAGGED
 ```
@@ -111,7 +118,8 @@ RECEIVED ─► GATED ─► ROUTING ─► DRAFTED ─► CHECKED ─┬─► 
    │          │                    │                ├─► NEEDS_APPROVAL ─┬─► SENT       └─► FLAGGED ─► REVIEWED_INCORRECT
    │          │                    │                │                   └─► DECLINED                     │ (correction
    └──────────┴───── any error ────┴───────────────►└─► UNANSWERED ─► PM_REPLIED ─► SENT                 ▼  optionally sent)
-                                                                                                    CORRECTED
+              │                                     ▲  (asker already got the fixed                CORRECTED
+              └── needs PM judgment ────────────────┘   "I don't know, contact Sara" reply)
 ```
 
 ## 4. Answer ladder
@@ -134,14 +142,35 @@ Cheapest correct path first. Every tier must pass **the same checks**. Escalatio
             │    OR our hosted model (managed)                                           │
             ├───────────────────────────── fails checks ─────────────────────────────────┤
             │ Tier 3  THE PM                                                             │
-            │  · goes to Unanswered with the best draft attached (if any)                │
+            │  · asker gets the fixed "I don't know, contact <PM>" reply immediately     │
+            │  · goes to Unanswered. The best draft is visible to the PM ONLY, marked    │
+            │    "unverified draft", and is never sent unless the PM approves it         │
             └───────────────────────────────────────────────────────────────────────────┘
 ```
+
+### 4.1 No-guess rule (hard rule, enforced in code)
+
+Kanwal **never predicts or guesses**, and never speaks *as* the PM.
+
+| Rule | Enforcement |
+|------|-------------|
+| **Judgment questions are never answered.** Opinion, decision, priority, approval, "will we…", "should I…", "does Sara want…", or a date or commitment not written in a source | The answerability classifier (rules + small model) runs **before** the ladder. When unsure, it's treated as a judgment question. Its output only decides *whether* to answer, never *what* to say |
+| **Only stated facts.** Every claim must be stated in, or directly entailed by, a cited permitted passage | A claim-level verifier. Any unsupported claim means the **whole answer is withheld** (not trimmed into a partial guess) |
+| **Abstention is a first-class output.** The model may return `unknown`, and that is final | `unknown` → DONT_KNOW. We never re-prompt to "try harder" or escalate an `unknown` into a guess. We escalate only on failed checks |
+| **The "don't know" reply is fixed text from code**, never model output | i18n template: *"I don't know. Please contact \<PM\>. I've let them know you asked."* |
+| **Suggested sources (optional, per project setting)** | Only links + **verbatim excerpts** from permitted sources, under the heading *"Suggested sources (not verified, may not answer your question)"*. No generated summary. Gate 1 applies |
+| **Never in the PM's voice.** Answers say "According to \<source\>…", never "Sara says/thinks…" | Template-wrapped output. A post-check rejects first-person PM phrasing and the PM's name as a subject |
+| **Accuracy notice on every asker-facing reply** | Appended by the channel adapter (not the model), and can't be disabled: *"Kanwal can be wrong. It is not 100% accurate. Check the sources or ask \<PM\>."* |
+| **No invented values** | Dates, owners, numbers, and statuses must match a source field or passage exactly (the Tier 0 lookup, or a verifier string match) |
+
+Metrics: **abstention rate** (healthy, not a failure), **wrong-answer rate**, **unsupported-claim rate in evals (target 0)**. The 100-question eval includes unanswerable and judgment questions, and the expected result is DONT_KNOW.
 
 | Check (every tier) | Rule | Fail means |
 |--------------------|------|------------|
 | Access | Every cited source passed Gate 1 for this asker | Drop the source, retry the tier once, else escalate |
-| Grounding | Every factual sentence maps to a cited passage (verifier pass) | Escalate |
+| Answerability | Not a judgment question (§4.1) | DONT_KNOW immediately, no tier runs |
+| Grounding | **Every** claim maps to a cited passage (claim-level verifier) | Escalate. Last tier → DONT_KNOW |
+| Abstention | The model returned `unknown` | DONT_KNOW (final, no retry into a guess) |
 | Citation integrity | Cited IDs ⊆ provided IDs, ≥ 1 citation | Escalate |
 | Confidence | Score ≥ per-tier threshold (set in week 1 from the 100-question eval) | Escalate |
 | Policy on content | Project `local-only` ⇒ Tier 2 can't use external providers | Use local Tier 2 or escalate to the PM |
@@ -480,6 +509,7 @@ Assume the model **will** be fooled, and make that harmless. Untrusted: source c
 | T22 | **Sensitive data sent to external LLM** | IT opt-in, per-project `local-only`, disclosure, provider allow-list | Routing tests per flag |
 | T23 | **Forged license / billing webhook** | Ed25519 license verified in the cell. Webhook signatures + idempotency + reconciliation | Forged-license and replay tests |
 | T24 | **Verified answer leaks to a new asker** | Re-run Gate 1 for each asker. Auto-invalidate on source change | Access test cases |
+| T25 | **Hallucinated or guessed answer presented as fact, or as the PM's view** | Answerability gate, claim-level verifier, final `unknown`, fixed DONT_KNOW text, no PM-voice phrasing, accuracy notice on every reply (§4.1) | Unanswerable and judgment questions in the eval → 100% DONT_KNOW |
 
 Baseline: SSO, TLS everywhere, encryption at rest, encrypted backups, dependency scanning, egress deny. Before the first paid deployment: external pentest, vulnerability disclosure policy, CRA 24 h reporting runbook. 2027: ISO 27001 + SOC 2 Type II on one control set.
 

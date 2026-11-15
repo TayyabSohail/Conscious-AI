@@ -55,6 +55,7 @@ Status: `OPEN` → `PROPOSED` → `DECIDED (date, who)`. Refs point to [PRD](./P
 | D-06 | Which baseline do savings claims name? | Name both. Lead with "one larger open model, no routing" | — |
 | D-09 | "Locked/unlocked" meaning | Plan tiers + add-ons + personas (Arch §10–11). Progressive per-user unlock: not planned | Arch §10 |
 | D-17 | Privacy promise wording vs the "Privacy-First Positioning" page (Dia, Obsidian) | Confirm P1–P10 | Arch §12 |
+| D-31 | **Suggested sources** on "I don't know" replies: links + verbatim excerpts only, or also model-written suggestions labeled "predicted"? | **Verbatim only.** Model-written suggestions are guesswork, which the no-guess rule forbids | Arch §4.1 |
 | D-30 | Screens: the design artifact couldn't be read by Claude Code. Export its HTML into the repo so the review inbox matches it exactly | — | Arch §6 |
 | — | `user_metadata.user_type` role checks in the boilerplate are user-editable, so they're unsafe for authorization ([auth-query.ts:56](../../src/lib/client/auth-query.ts)) | Replace when D-07 lands | Arch §9 |
 

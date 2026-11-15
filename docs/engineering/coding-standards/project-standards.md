@@ -17,6 +17,7 @@ These rules come from the product's non-negotiables ([product rules](../../produ
 - [ ] Every access decision goes through the **policy engine**. No ad-hoc `if (user.role === …)` checks for content access.
 - [ ] **Fail closed.** Errors, timeouts, `undefined`, or an unknown source answer all mean **deny**. Never use `catch { return true }` or a default-allow fallback.
 - [ ] Only one function sends an answer, and it requires a `PolicyDecision` that only the policy engine can create. Never bypass it.
+- [ ] **No-guess rule** (architecture §4.1): judgment questions never reach a model for an answer. Any unsupported claim withholds the whole answer. Model `unknown` is final. DONT_KNOW and accuracy-notice text come from i18n templates in code, never from the model.
 - [ ] Refusal responses and errors **never reveal** that a restricted item exists. That covers the message, status code, and timing where feasible.
 - [ ] Feature gating is checked **server-side** through the entitlement service. The UI "locked" state is cosmetic only.
 

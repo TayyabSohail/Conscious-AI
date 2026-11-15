@@ -9,6 +9,7 @@ Kanwal (working name): a private, self-hosted assistant for project managers. **
 
 ## Hard rules
 - Fail closed: any error in an access or policy check means nothing is sent.
+- Never guess: an unsupported or judgment question gets the fixed "I don't know, please contact <PM>" reply (code, not model text). Every asker reply carries the accuracy notice. Never phrase output as the PM.
 - Never log question or answer text, document content, tokens, or secrets.
 - No outbound calls, telemetry, or third-party scripts in product code.
 - Never commit, push, create Linear tickets, or run DB migrations without explicit permission.
