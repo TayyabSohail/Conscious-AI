@@ -173,7 +173,7 @@ Both connections are read-only, and access is checked live for the person asking
 | Codebase | One repository: `apps/web`, `apps/api`, `infra`, `evals`. pnpm for the web app, uv for Python | Code, infrastructure, and tests in one place |
 | Web app | Next.js, React, TypeScript, Tailwind, shadcn/ui, TanStack Query | User interface. No access decisions are made in the browser |
 | Server | Python 3.12, FastAPI, Pydantic, SQLAlchemy, Alembic | API and access rules, written as testable code |
-| Background jobs | The same Python code run as a worker, with its job queue in PostgreSQL | Source sync, flags, and data retention |
+| Background jobs | Procrastinate: a Python worker with its job queue and schedules in PostgreSQL | Keeps the copy of Jira and Confluence current, raises flags, and deletes data when retention ends. No separate queue service to run |
 | Database | PostgreSQL 16 with pgvector | Application data, search index, sessions, jobs, and audit log |
 | AI models | OpenRouter API: a low-cost model first, a stronger model when needed | Pay per use, with a wide choice of models |
 | Search index | An open embedding model running on the app server | Tickets and pages are indexed on our own servers |
