@@ -250,7 +250,7 @@
 
   <rect x="1260" y="355" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
   <text x="1280" y="385" font-size="16" font-weight="700" fill="#0F172A">AI models</text>
-  <text x="1362" y="385" font-size="12.5" fill="#64748B">via OpenRouter</text>
+  <text x="1362" y="385" font-size="12.5" fill="#64748B">via Amazon Bedrock</text>
   <text x="1280" y="412" font-size="13" fill="#475569">Receive only the question and the</text>
   <text x="1280" y="430" font-size="13" fill="#475569">passages that passed the checks.</text>
   <text x="1280" y="448" font-size="13" fill="#475569">Nothing is kept or used for training.</text>

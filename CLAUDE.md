@@ -10,7 +10,7 @@ Kanwal (working name): an AI assistant for project managers, hosted by us with o
 - Fail closed: any error in an access or policy check means nothing is sent.
 - Never guess: an unsupported or judgment question gets the fixed "I don't know, please contact <PM>" reply (code, not model text). Every asker reply carries the accuracy notice. Never phrase output as the PM.
 - Never log question or answer text, document content, tokens, or secrets.
-- Outbound calls go only to the approved list: Jira Cloud, Confluence Cloud, Google and Microsoft sign-in, OpenRouter, and the invitation mail sender. No telemetry or third-party scripts in product code.
+- Outbound calls go only to the approved list: Jira Cloud, Confluence Cloud, Google and Microsoft sign-in, Amazon Bedrock (through the private endpoint), and the invitation mail sender. No telemetry or third-party scripts in product code.
 - Send to AI only the question and the passages that passed the access checks. Projects marked "keep local" send nothing.
 - Sources are read-only. Kanwal writes only replies to the person who asked, and invitation emails.
 - Never commit, push, create Linear tickets, or run DB migrations without explicit permission.
