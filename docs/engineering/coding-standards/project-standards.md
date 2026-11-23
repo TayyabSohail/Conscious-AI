@@ -1,6 +1,6 @@
 # Project standards (Kanwal-specific)
 
-These rules come from the product's non-negotiables ([product rules](../../product/PRD.md), [security architecture](../architecture.md)). Where they conflict with [standards.md](./standards.md), **these win**.
+These rules come from the product's non-negotiables ([product plan](../../product/kanwal-v0-master-scope.md)). Where they conflict with [standards.md](./standards.md), **these win**.
 
 ## 1. Known conflicts with the general standards
 
@@ -30,7 +30,7 @@ These rules come from the product's non-negotiables ([product rules](../../produ
 - [ ] **Never log** question or answer text, document content, tokens, cookies, or secrets. Use the logger's redaction, and add a test when you add a new log field.
 - [ ] No outbound network calls except to the configured customer tools. No third-party scripts, analytics, CDNs, or remote fonts at runtime.
 - [ ] The metrics `events` table never gets a text column.
-- [ ] Every new feature, connector, or pack declares a `privacy:` block in its manifest ([architecture §12](../architecture.md)). New egress or a new stored data type needs a privacy reviewer.
+- [ ] Every new feature, connector, or pack declares a `privacy:` block in its manifest ([product plan, section 7](../../product/kanwal-v0-master-scope.md)). New egress or a new stored data type needs a privacy reviewer.
 - [ ] Every new stored data type has a **retention rule** and is covered by export and delete.
 
 **Secrets**

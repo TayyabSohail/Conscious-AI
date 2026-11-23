@@ -1,6 +1,6 @@
 ## Codebase guides (from the Next.js + Supabase boilerplate)
 
-> These guides describe the boilerplate this repo started from. Coding standards in [../coding-standards/](../coding-standards/README.md) take priority over them. Supabase-specific guides depend on decision D-07 (see product/decisions.md).
+> These guides describe the boilerplate this repo started from. Coding standards in [../coding-standards/](../coding-standards/README.md) take priority over them. The Supabase-specific guides describe the boilerplate only; the product uses a Python backend on PostgreSQL (see the [product plan](../../product/kanwal-v0-master-scope.md)).
 
 Read these documents in order. This file provides a brief overview and links to detailed guides.
 

@@ -1,0 +1,328 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1080" width="1600" height="1080" role="img" aria-label="How Kanwal answers a team member's question: an encrypted connection from the browser, five security checks, an answer found only in sources the person can open, and a reply to that person only. Data stays in a private, encrypted space per company. Jira and Confluence are read-only, and the AI receives only the question and approved passages." font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow-ink" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9 Z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9 Z" fill="#2F5BEA"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9 Z" fill="#15803D"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9 Z" fill="#B45309"/>
+    </marker>
+
+    <symbol id="i-lock" viewBox="0 0 24 24">
+      <rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24">
+      <path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6l7-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <polyline points="8.5,12 11,14.5 15.5,9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" fill="currentColor"/>
+      <polyline points="7.5,12.5 10.5,15.5 16.5,9" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-key" viewBox="0 0 24 24">
+      <circle cx="8" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M11 12l9-9M16 7l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-db" viewBox="0 0 24 24">
+      <ellipse cx="12" cy="6" rx="7" ry="3" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" fill="none" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    <symbol id="i-gate" viewBox="0 0 24 24">
+      <path d="M10 4h9v16h-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M3 12h11M11 9l3 3-3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-backup" viewBox="0 0 24 24">
+      <path d="M4 12a8 8 0 1 0 2.6-5.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-log" viewBox="0 0 24 24">
+      <rect x="5" y="4" width="14" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24">
+      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M16 16l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24">
+      <path d="M3 12l9-9h8v8l-9 9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="16" cy="8" r="1.6" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-book" viewBox="0 0 24 24">
+      <path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-building" viewBox="0 0 24 24">
+      <path d="M5 21V5l7-3 7 3v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M9 9h2M13 9h2M9 13h2M13 13h2M10 21v-4h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M10 8.5v7M14 8.5v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="1080" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <text x="40" y="62" font-size="32" font-weight="700" fill="#0F172A">How Kanwal answers your team, safely</text>
+  <text x="40" y="94" font-size="16" fill="#475569">Every question follows the same guarded path. This is where your data goes, and what protects it at each step.</text>
+
+  <!-- Legend -->
+  <g font-size="13" fill="#334155">
+    <use href="#i-lock" x="1172" y="44" width="18" height="18" color="#2F5BEA"/>
+    <text x="1196" y="58">Encrypted</text>
+    <use href="#i-shield" x="1284" y="44" width="18" height="18" color="#15803D"/>
+    <text x="1308" y="58">Security check</text>
+    <line x1="1424" y1="53" x2="1456" y2="53" stroke="#334155" stroke-width="2" marker-end="url(#arrow-ink)"/>
+    <text x="1466" y="58">Data flow</text>
+  </g>
+
+  <!-- ================= Left column: people ================= -->
+  <text x="40" y="152" font-size="12" font-weight="700" letter-spacing="1.2" fill="#64748B">YOUR PEOPLE</text>
+
+  <rect x="40" y="170" width="230" height="82" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <use href="#i-key" x="56" y="184" width="24" height="24" color="#2F5BEA"/>
+  <text x="90" y="202" font-size="15" font-weight="700" fill="#0F172A">Company sign-in</text>
+  <text x="56" y="225" font-size="12.5" fill="#475569">Google or Microsoft account.</text>
+  <text x="56" y="242" font-size="12.5" fill="#475569">Kanwal stores no passwords.</text>
+
+  <rect x="40" y="270" width="230" height="245" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <circle cx="155" cy="322" r="28" fill="#EEF3FF"/>
+  <use href="#i-user" x="139" y="306" width="32" height="32" color="#2F5BEA"/>
+  <text x="155" y="378" font-size="16" font-weight="700" fill="#0F172A" text-anchor="middle">Team member</text>
+  <text x="155" y="400" font-size="13" fill="#475569" text-anchor="middle">Asks a question</text>
+  <text x="155" y="418" font-size="13" fill="#475569" text-anchor="middle">in a web browser</text>
+  <line x1="70" y1="446" x2="240" y2="446" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="155" y="472" font-size="12.5" fill="#475569" text-anchor="middle">Sees only their own</text>
+  <text x="155" y="489" font-size="12.5" fill="#475569" text-anchor="middle">questions and answers</text>
+
+  <rect x="40" y="530" width="230" height="122" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <circle cx="78" cy="566" r="20" fill="#FFF7E6"/>
+  <use href="#i-user" x="66" y="554" width="24" height="24" color="#B45309"/>
+  <text x="108" y="563" font-size="15" font-weight="700" fill="#0F172A">Project Manager</text>
+  <text x="108" y="581" font-size="12.5" fill="#475569">Answers or approves</text>
+  <text x="56" y="615" font-size="12.5" fill="#475569">The reply then goes to the</text>
+  <text x="56" y="632" font-size="12.5" fill="#475569">person who asked.</text>
+
+  <!-- ================= Private space container ================= -->
+  <rect x="340" y="130" width="840" height="655" rx="22" fill="#F6F8FF" stroke="#C9D6FF" stroke-width="2"/>
+  <use href="#i-shield" x="364" y="150" width="28" height="28" color="#2F5BEA"/>
+  <text x="402" y="171" font-size="19" font-weight="700" fill="#0F172A">Your private Kanwal space</text>
+  <text x="402" y="192" font-size="13" fill="#475569">One per company · hosted on AWS · nothing shared with other companies</text>
+
+  <rect x="920" y="150" width="236" height="30" rx="15" fill="#FFFFFF" stroke="#C9D6FF" stroke-width="1.5"/>
+  <use href="#i-lock" x="934" y="156" width="18" height="18" color="#2F5BEA"/>
+  <text x="960" y="170" font-size="12.5" font-weight="700" fill="#2F5BEA">Everything stored is encrypted</text>
+
+  <!-- Step 1: front door -->
+  <rect x="365" y="235" width="170" height="200" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <circle cx="389" cy="261" r="12" fill="#2F5BEA"/>
+  <text x="389" y="265.5" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="409" y="266" font-size="15.5" font-weight="700" fill="#0F172A">Front door</text>
+  <use href="#i-lock" x="428" y="286" width="44" height="44" color="#2F5BEA"/>
+  <text x="450" y="356" font-size="13" fill="#0F172A" text-anchor="middle">Encrypted connection</text>
+  <text x="450" y="374" font-size="13" fill="#475569" text-anchor="middle">from your browser</text>
+  <rect x="410" y="390" width="80" height="26" rx="13" fill="#EEF3FF"/>
+  <text x="450" y="407.5" font-size="12" font-weight="700" fill="#2F5BEA" text-anchor="middle">HTTPS</text>
+
+  <!-- Step 2: security checks -->
+  <rect x="565" y="235" width="210" height="200" rx="14" fill="#FFFFFF" stroke="#A6E9C0" stroke-width="2"/>
+  <circle cx="589" cy="261" r="12" fill="#15803D"/>
+  <text x="589" y="265.5" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="609" y="266" font-size="15.5" font-weight="700" fill="#0F172A">Security checks</text>
+  <g font-size="13" fill="#0F172A">
+    <use href="#i-check" x="583" y="284" width="16" height="16" color="#15803D"/>
+    <text x="607" y="297">Invited, active member</text>
+    <use href="#i-check" x="583" y="308" width="16" height="16" color="#15803D"/>
+    <text x="607" y="321">PM's rule allows it</text>
+    <use href="#i-check" x="583" y="332" width="16" height="16" color="#15803D"/>
+    <text x="607" y="345">Can open every source</text>
+    <use href="#i-check" x="583" y="356" width="16" height="16" color="#15803D"/>
+    <text x="607" y="369">Every statement sourced</text>
+    <use href="#i-check" x="583" y="380" width="16" height="16" color="#15803D"/>
+    <text x="607" y="393">Checked again at send</text>
+  </g>
+  <text x="583" y="420" font-size="12" font-weight="700" fill="#15803D">Any failure: nothing is sent</text>
+
+  <!-- Step 3: find the answer -->
+  <rect x="805" y="235" width="210" height="200" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <circle cx="829" cy="261" r="12" fill="#2F5BEA"/>
+  <text x="829" y="265.5" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="849" y="266" font-size="15.5" font-weight="700" fill="#0F172A">Find the answer</text>
+  <text x="823" y="292" font-size="12.5" fill="#475569">Cheapest step first</text>
+  <rect x="823" y="302" width="174" height="28" rx="8" fill="#F1F5F9"/>
+  <text x="835" y="321" font-size="13" fill="#0F172A">Lookup, no AI</text>
+  <text x="987" y="321" font-size="11.5" fill="#64748B" text-anchor="end">free</text>
+  <rect x="823" y="336" width="174" height="28" rx="8" fill="#EEF3FF"/>
+  <text x="835" y="355" font-size="13" fill="#0F172A">Low-cost AI</text>
+  <text x="987" y="355" font-size="11.5" fill="#64748B" text-anchor="end">under 1¢</text>
+  <rect x="823" y="370" width="174" height="28" rx="8" fill="#DCE6FF"/>
+  <text x="835" y="389" font-size="13" fill="#0F172A">Stronger AI</text>
+  <text x="987" y="389" font-size="11.5" fill="#64748B" text-anchor="end">a few ¢</text>
+  <text x="823" y="420" font-size="12" font-weight="700" fill="#0F172A">Only from what you can open</text>
+
+  <!-- Exit gate -->
+  <rect x="1045" y="235" width="110" height="200" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="1100" y="266" font-size="15" font-weight="700" fill="#0F172A" text-anchor="middle">Exit gate</text>
+  <use href="#i-gate" x="1080" y="284" width="40" height="40" color="#2F5BEA"/>
+  <text x="1100" y="352" font-size="13" fill="#475569" text-anchor="middle">Approved</text>
+  <text x="1100" y="370" font-size="13" fill="#475569" text-anchor="middle">destinations</text>
+  <text x="1100" y="388" font-size="13" fill="#475569" text-anchor="middle">only</text>
+
+  <!-- Arrows along the path -->
+  <line x1="270" y1="335" x2="361" y2="335" stroke="#2F5BEA" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <circle cx="312" cy="335" r="13" fill="#FFFFFF" stroke="#2F5BEA" stroke-width="1.5"/>
+  <use href="#i-lock" x="304" y="327" width="16" height="16" color="#2F5BEA"/>
+  <text x="305" y="312" font-size="11.5" fill="#475569" text-anchor="middle">question</text>
+
+  <line x1="535" y1="335" x2="561" y2="335" stroke="#2F5BEA" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <line x1="775" y1="335" x2="801" y2="335" stroke="#2F5BEA" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <line x1="1015" y1="335" x2="1041" y2="335" stroke="#2F5BEA" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- Step 4: reply lane -->
+  <rect x="365" y="460" width="575" height="56" rx="28" fill="#ECFDF3" stroke="#A6E9C0" stroke-width="1.5"/>
+  <circle cx="395" cy="488" r="12" fill="#15803D"/>
+  <text x="395" y="492.5" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="417" y="493" font-size="14.5" font-weight="700" fill="#0F172A">Reply</text>
+  <text x="466" y="493" font-size="13" fill="#334155">only to the person who asked, labeled as AI, with its sources</text>
+  <line x1="870" y1="435" x2="870" y2="456" stroke="#15803D" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+  <line x1="365" y1="488" x2="274" y2="488" stroke="#15803D" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+  <circle cx="312" cy="488" r="13" fill="#FFFFFF" stroke="#15803D" stroke-width="1.5"/>
+  <use href="#i-lock" x="304" y="480" width="16" height="16" color="#15803D"/>
+  <text x="305" y="465" font-size="11.5" fill="#475569" text-anchor="middle">reply</text>
+
+  <!-- PM lane -->
+  <rect x="365" y="540" width="650" height="56" rx="28" fill="#FFF7E6" stroke="#F7D58A" stroke-width="1.5"/>
+  <circle cx="395" cy="568" r="12" fill="#B45309"/>
+  <text x="395" y="572.5" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">?</text>
+  <text x="417" y="573" font-size="14.5" font-weight="700" fill="#0F172A">Not certain?</text>
+  <text x="512" y="573" font-size="13" fill="#334155">Kanwal says "I don't know" and passes the question to the PM</text>
+  <line x1="980" y1="435" x2="980" y2="536" stroke="#B45309" stroke-width="2.5" marker-end="url(#arrow-amber)"/>
+  <line x1="365" y1="568" x2="274" y2="568" stroke="#B45309" stroke-width="2.5" marker-end="url(#arrow-amber)"/>
+
+  <!-- Stored inside -->
+  <text x="365" y="630" font-size="12" font-weight="700" letter-spacing="1.2" fill="#64748B">STORED INSIDE YOUR SPACE</text>
+
+  <rect x="365" y="645" width="250" height="118" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <use href="#i-db" x="381" y="660" width="28" height="28" color="#2F5BEA"/>
+  <text x="419" y="680" font-size="15" font-weight="700" fill="#0F172A">Encrypted database</text>
+  <text x="383" y="710" font-size="12.5" fill="#475569">Your own database and your own</text>
+  <text x="383" y="727" font-size="12.5" fill="#475569">encryption key. PM chats are</text>
+  <text x="383" y="744" font-size="12.5" fill="#475569">encrypted a second time.</text>
+
+  <rect x="635" y="645" width="250" height="118" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <use href="#i-backup" x="651" y="660" width="28" height="28" color="#2F5BEA"/>
+  <text x="689" y="680" font-size="15" font-weight="700" fill="#0F172A">Encrypted backups</text>
+  <text x="653" y="710" font-size="12.5" fill="#475569">Automatic, with seven days of</text>
+  <text x="653" y="727" font-size="12.5" fill="#475569">point-in-time recovery.</text>
+
+  <rect x="905" y="645" width="250" height="118" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <use href="#i-log" x="921" y="660" width="28" height="28" color="#2F5BEA"/>
+  <text x="959" y="680" font-size="15" font-weight="700" fill="#0F172A">Audit log</text>
+  <text x="923" y="710" font-size="12.5" fill="#475569">Every action is recorded.</text>
+  <text x="923" y="727" font-size="12.5" fill="#475569">No question or answer text is</text>
+  <text x="923" y="744" font-size="12.5" fill="#475569">written to logs.</text>
+
+  <!-- ================= Right column: connected services ================= -->
+  <text x="1260" y="152" font-size="12" font-weight="700" letter-spacing="1.2" fill="#64748B">CONNECTED SERVICES</text>
+
+  <rect x="1260" y="225" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="1280" y="255" font-size="16" font-weight="700" fill="#0F172A">Jira and Confluence</text>
+  <text x="1280" y="282" font-size="13" fill="#475569">Read-only: Kanwal never edits.</text>
+  <text x="1280" y="300" font-size="13" fill="#475569">Each person connects their account.</text>
+  <text x="1280" y="318" font-size="13" fill="#475569">Permissions are checked live.</text>
+
+  <rect x="1260" y="355" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="1280" y="385" font-size="16" font-weight="700" fill="#0F172A">AI models</text>
+  <text x="1362" y="385" font-size="12.5" fill="#64748B">via OpenRouter</text>
+  <text x="1280" y="412" font-size="13" fill="#475569">Receive only the question and the</text>
+  <text x="1280" y="430" font-size="13" fill="#475569">passages that passed the checks.</text>
+  <text x="1280" y="448" font-size="13" fill="#475569">Nothing is kept or used for training.</text>
+
+  <line x1="1159" y1="285" x2="1256" y2="285" stroke="#334155" stroke-width="2" marker-start="url(#arrow-ink)" marker-end="url(#arrow-ink)"/>
+  <text x="1220" y="276" font-size="11.5" fill="#475569" text-anchor="middle">read-only</text>
+  <line x1="1159" y1="415" x2="1256" y2="415" stroke="#334155" stroke-width="2" marker-start="url(#arrow-ink)" marker-end="url(#arrow-ink)"/>
+  <text x="1220" y="406" font-size="11.5" fill="#475569" text-anchor="middle">checked text</text>
+
+  <rect x="1260" y="520" width="300" height="265" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="1280" y="554" font-size="17" font-weight="700" fill="#0F172A">Reliable by design</text>
+  <g>
+    <use href="#i-check" x="1280" y="578" width="18" height="18" color="#15803D"/>
+    <text x="1308" y="592" font-size="14" font-weight="700" fill="#0F172A">Always on</text>
+    <text x="1308" y="610" font-size="12.5" fill="#475569">Nothing has to start on demand.</text>
+    <use href="#i-check" x="1280" y="630" width="18" height="18" color="#15803D"/>
+    <text x="1308" y="644" font-size="14" font-weight="700" fill="#0F172A">Automatic backups</text>
+    <text x="1308" y="662" font-size="12.5" fill="#475569">Seven-day point-in-time recovery.</text>
+    <use href="#i-check" x="1280" y="682" width="18" height="18" color="#15803D"/>
+    <text x="1308" y="696" font-size="14" font-weight="700" fill="#0F172A">Monitored</text>
+    <text x="1308" y="714" font-size="12.5" fill="#475569">Alerts when something needs attention.</text>
+    <use href="#i-check" x="1280" y="734" width="18" height="18" color="#15803D"/>
+    <text x="1308" y="748" font-size="14" font-weight="700" fill="#0F172A">Separate per company</text>
+    <text x="1308" y="766" font-size="12.5" fill="#475569">One space never affects another.</text>
+  </g>
+
+  <!-- ================= What makes Kanwal different ================= -->
+  <text x="40" y="838" font-size="22" font-weight="700" fill="#0F172A">What makes Kanwal different</text>
+
+  <g>
+    <rect x="40" y="860" width="240" height="180" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+    <circle cx="80" cy="902" r="22" fill="#EEF3FF"/>
+    <use href="#i-eye" x="68" y="890" width="24" height="24" color="#2F5BEA"/>
+    <text x="60" y="952" font-size="15.5" font-weight="700" fill="#0F172A">Same access as you</text>
+    <text x="60" y="976" font-size="13" fill="#475569">You are told only what you</text>
+    <text x="60" y="994" font-size="13" fill="#475569">could already open yourself.</text>
+
+    <rect x="296" y="860" width="240" height="180" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+    <circle cx="336" cy="902" r="22" fill="#EEF3FF"/>
+    <use href="#i-search" x="324" y="890" width="24" height="24" color="#2F5BEA"/>
+    <text x="316" y="952" font-size="15.5" font-weight="700" fill="#0F172A">Never guesses</text>
+    <text x="316" y="976" font-size="13" fill="#475569">If the sources don't say it,</text>
+    <text x="316" y="994" font-size="13" fill="#475569">Kanwal says "I don't know"</text>
+    <text x="316" y="1012" font-size="13" fill="#475569">and asks the PM.</text>
+
+    <rect x="552" y="860" width="240" height="180" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+    <circle cx="592" cy="902" r="22" fill="#EEF3FF"/>
+    <use href="#i-tag" x="580" y="890" width="24" height="24" color="#2F5BEA"/>
+    <text x="572" y="952" font-size="15.5" font-weight="700" fill="#0F172A">Never speaks for the PM</text>
+    <text x="572" y="976" font-size="13" fill="#475569">Every reply is labeled as AI</text>
+    <text x="572" y="994" font-size="13" fill="#475569">and shows its sources.</text>
+
+    <rect x="808" y="860" width="240" height="180" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+    <circle cx="848" cy="902" r="22" fill="#EEF3FF"/>
+    <use href="#i-book" x="836" y="890" width="24" height="24" color="#2F5BEA"/>
+    <text x="828" y="952" font-size="15.5" font-weight="700" fill="#0F172A">Read-only on your tools</text>
+    <text x="828" y="976" font-size="13" fill="#475569">Kanwal reads Jira and</text>
+    <text x="828" y="994" font-size="13" fill="#475569">Confluence. It never edits</text>
+    <text x="828" y="1012" font-size="13" fill="#475569">a ticket or a page.</text>
+
+    <rect x="1064" y="860" width="240" height="180" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+    <circle cx="1104" cy="902" r="22" fill="#EEF3FF"/>
+    <use href="#i-building" x="1092" y="890" width="24" height="24" color="#2F5BEA"/>
+    <text x="1084" y="952" font-size="15.5" font-weight="700" fill="#0F172A">Private per company</text>
+    <text x="1084" y="976" font-size="13" fill="#475569">Your own space, database,</text>
+    <text x="1084" y="994" font-size="13" fill="#475569">and encryption key.</text>
+
+    <rect x="1320" y="860" width="240" height="180" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+    <circle cx="1360" cy="902" r="22" fill="#FFF7E6"/>
+    <use href="#i-pause" x="1348" y="890" width="24" height="24" color="#B45309"/>
+    <text x="1340" y="952" font-size="15.5" font-weight="700" fill="#0F172A">You stay in control</text>
+    <text x="1340" y="976" font-size="13" fill="#475569">Approve, correct, or pause</text>
+    <text x="1340" y="994" font-size="13" fill="#475569">Kanwal at any time.</text>
+  </g>
+</svg>

@@ -1,16 +1,17 @@
 # CLAUDE.md
 
-Kanwal (working name): a private, self-hosted assistant for project managers. **Security and correct execution are the top priority, always.**
+Kanwal (working name): an AI assistant for project managers, hosted by us with one private space per company. **Security and correct execution are the top priority, always.**
 
 ## Read first
-- Product: `docs/product/PRD.md` (IDs `FR-`, `PLT-`, `NFR-`, `SEC-`) and `docs/product/decisions.md` (`D-` IDs).
-- Architecture: `docs/engineering/architecture.md`.
+- Product, scope (v0 and v1), architecture, security, and cost: `docs/product/kanwal-v0-master-scope.md`. This is the single source of truth.
 - Coding standards: use the `coding-standards` skill (`.claude/skills/coding-standards/`). It points to `docs/engineering/coding-standards/`.
 
 ## Hard rules
 - Fail closed: any error in an access or policy check means nothing is sent.
 - Never guess: an unsupported or judgment question gets the fixed "I don't know, please contact <PM>" reply (code, not model text). Every asker reply carries the accuracy notice. Never phrase output as the PM.
 - Never log question or answer text, document content, tokens, or secrets.
-- No outbound calls, telemetry, or third-party scripts in product code.
+- Outbound calls go only to the approved list: Jira Cloud, Confluence Cloud, Google and Microsoft sign-in, OpenRouter, and the invitation mail sender. No telemetry or third-party scripts in product code.
+- Send to AI only the question and the passages that passed the access checks. Projects marked "keep local" send nothing.
+- Sources are read-only. Kanwal writes only replies to the person who asked, and invitation emails.
 - Never commit, push, create Linear tickets, or run DB migrations without explicit permission.
-- Decided: Python (FastAPI) backend on plain Postgres, no Supabase or PostHog (D-07); cloud-first deployment, on-prem in v1+ (D-32). Open decisions (e.g. D-33 relay vs VPN, D-36 DC ACL check) are not settled. Don't build product features that assume an answer.
+- Stack: Next.js web app, Python (FastAPI) backend, PostgreSQL with pgvector on AWS. No Supabase or PostHog for company data. v0 integrates Jira Cloud and Confluence Cloud only; everything else is v1.
