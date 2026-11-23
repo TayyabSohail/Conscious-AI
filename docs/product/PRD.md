@@ -27,8 +27,8 @@ A private assistant that **answers colleagues' questions in place of the PM**. I
 
 | Role | Who | Can |
 |------|-----|-----|
-| **Owner** (v0: PM) | Person Kanwal covers for | Private chat, rules, sharing, approvals, review (mark correct/incorrect), metrics |
-| **Buyer** | PM (self-serve card) or org admin | Buy seats and add-ons, manage billing in the hosted portal. Lives in the control plane, not the cell |
+| **Owner** (v0: PM) = **the customer** | Person Kanwal covers for. Signs up, pays, owns their workspace and data | Private chat, rules, sharing, approvals, review (mark correct/incorrect), metrics |
+| **Buyer** | The PM (self-serve card). Later an org admin may consolidate PM seats | Buy seats and add-ons, manage billing in the hosted portal. Lives in the control plane, not the cell |
 | **Asker** | Any colleague signed in via company SSO, in the web app or Slack | Ask, flag an answer as wrong, export or delete own questions |
 | **IT admin** | Customer IT | Connectors, LLM providers and keys, retention ceilings, audit, pause. **Cannot read Owner private chats** |
 | **Auditor** | DPO / works council | Read-only audit. Reading is itself logged |
@@ -78,7 +78,7 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 | FR-21 | Teams channel | v1 |
 | FR-22 | More sources: SharePoint, OneDrive, Google Drive, **Linear**, JSM, and any PM tool via **MCP** | v1 |
 | FR-23 | German UI (i18n from v0) · offline installer | v1 |
-| FR-24 | Managed hosting (one dedicated cell per customer) | v2 |
+| FR-24 | Managed hosting (one dedicated cell per company) | v2 |
 | FR-25 | Workflows ("release at risk → draft note → PM approves") · customer extensions via their own MCP servers | v2 |
 | FR-26 | Kanwal exposed as an MCP server ("Ask Kanwal" from Claude Desktop / IDEs), off by default | v2 |
 | FR-27 | **Billing**: charge per Owner (PM) seat and/or per feature add-on and plan tier, via a payment gateway (hosted checkout, customer portal, invoices, EU VAT). A PM can self-serve with a card, and orgs can consolidate seats. Delivered to cells as a signed license; lapses mean grace, then read-only, never data loss | v1 (license layer v0) |
@@ -89,8 +89,9 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 
 | ID | Requirement | Pri |
 |----|-------------|-----|
-| PLT-01 | **Cell per customer**: own app, DB, model, keys, backups. Nothing shared between customers | MUST |
-| PLT-02 | **One signed build, deployment profiles**: `local` (on-prem), `private-cloud` (customer's AWS/Azure/GCP), `managed` (our dedicated cell) | MUST (`local` v0) |
+| PLT-01 | **Cell per company, workspace per PM (the customer)**: a cell has its own app, DB, model, keys, backups and holds only one company's PMs. Each PM's workspace has its own key; nothing crosses between PMs unless shared. Nothing is shared between companies | MUST |
+| PLT-02 | **One signed build, deployment profiles, cloud first**: `private-cloud` (customer's AWS/Azure/GCP) and `managed` (a dedicated cell we run for one customer) in v0; `local` (on-prem) in v1+. The core uses no cloud-only services, so on-prem stays possible | MUST (`private-cloud` + `managed` v0) |
+| PLT-11 | **Hybrid sources**: a cloud cell reaches on-prem tools (Atlassian DC) through an outbound-only connector relay or a VPN. No inbound ports at the customer | MUST (v0, if the pilot's DC is on-prem) |
 | PLT-03 | **Connector framework**: native, MCP, or hybrid adapters behind one interface, mapped to a canonical PM model | MUST |
 | PLT-04 | **MCP connectivity**: IT adds any MCP server without code. Every tool starts blocked and is classified read / write / destructive. Definitions are hash-pinned | MUST (design v0, ship v1) |
 | PLT-05 | **Per-call authorization**: server, tool, and target project/team × role/group × Owner rule × profile × license | MUST |
@@ -151,7 +152,7 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 |----|--------|
 | NFR-01 | First token < 2 s at 10 concurrent askers |
 | NFR-02 | 100 real questions (EN/DE) meet the bar set in week 1 |
-| NFR-03 | A non-builder installs it in < 1 h from the guide |
+| NFR-03 | A non-builder installs a cell in a cloud account in < 1 h from the guide (Terraform + one command) |
 | NFR-04 | Backup restores cleanly. RTO ≤ 4 h. Tested before each release |
 | NFR-05 | WCAG 2.2 AA · last two versions of Chrome/Edge/Firefox/Safari · i18n from day one |
 | NFR-06 | Pilot sizing: ≤ 10 PMs on 1× 24 GB GPU, 8 cores, 64 GB RAM, 500 GB NVMe |
@@ -167,7 +168,7 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 | SEC-03 | Retrieved and tool content is data, never instructions. It can't trigger actions |
 | SEC-04 | Plain-text rendering: no auto-loaded images or links except verified source links |
 | SEC-05 | Refusals never reveal that a restricted item exists |
-| SEC-06 | OIDC with the company IdP only. No local passwords. Slack users are mapped to IdP identities; unmapped means refused |
+| SEC-06 | OIDC with the company IdP (or bundled Keycloak if they have none). Kanwal stores no passwords. MFA enforced and checked for IT/Owner. Server-side sessions (8 h idle / 12 h absolute). Slack users are mapped to IdP identities; unmapped means refused |
 | SEC-07 | Model servers are private-network only, with telemetry off |
 | SEC-08 | Egress deny-by-default. Allow-list per connector/provider. A shipped proof script |
 | SEC-09 | Read-only least-privilege connector tokens and **LLM API keys in the secrets vault**, envelope-encrypted, rotated, never logged, never sent to the browser |
@@ -183,7 +184,7 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 
 | Week | Dates | Work | Milestone |
 |------|-------|------|-----------|
-| 1 | Nov 16–20 | Foundations; model test + answer ladder (start); **spikes: Confluence DC ACL check, egress proof** | Re-plan |
+| 1 | Nov 16–20 | Foundations; Terraform for one cloud cell; model test + answer ladder (start); **spikes: Confluence DC ACL check, network path to the pilot's DC (relay or VPN), egress proof on the cloud cell** | Re-plan |
 | 2 | Nov 23–27 | Ladder (finish); connectors + index | Jira/Confluence sync |
 | 3 | Nov 30–Dec 4 | Access checks; Think it through | 50-case access test, 0 leaks |
 | 4 | Dec 7–11 | Cover mode, rules, sharing picker, approvals, **review inbox** | Answers with sources |
@@ -191,4 +192,6 @@ Colleague asks (Slack / web)  →  Kanwal checks access  →  gathers from Jira/
 | 6 | Dec 21–24 | Data controls + IT console (finish); hardening | Dec 22 feature freeze |
 | 7 | Dec 28–31 | Hardening; buffer | Dec 31 pilot-ready |
 
-**Cut order if behind:** heads-up → report polish → sharing by person (sharing by project stays). **BYO-key providers and Slack add scope**, which needs a re-plan in week 1 (D-22, D-23).
+**Cut order if behind:** heads-up → report polish → sharing by person (sharing by project stays). **BYO-key providers, Slack, and the connector relay add scope**, which needs a re-plan in week 1 (D-22, D-23, D-33).
+
+**Before real pilot data:** DPA and subprocessor list signed (D-35), dedicated pilot GPU ready (D-34).

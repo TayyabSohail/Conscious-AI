@@ -6,7 +6,7 @@ These rules come from the product's non-negotiables ([product rules](../../produ
 
 | General standard says | Project position | Status |
 |-----------------------|------------------|--------|
-| Supabase for auth and DB, `supabase-and-actions.md` | The architecture proposes plain PostgreSQL + OIDC with the company IdP, and the business logic in a Python API | Pending **D-07**. Until it's decided, the Supabase rules apply to the existing boilerplate code only. **Don't build new product features on Supabase-specific APIs** (RLS-as-authz, PostgREST from the browser, Supabase Auth) |
+| Supabase for auth and DB, `supabase-and-actions.md` | The architecture proposes plain PostgreSQL + OIDC with the company IdP, and the business logic in a Python API | **D-07 decided (2026-11-16): Python API + plain Postgres, Supabase dropped.** The Supabase rules apply only to existing boilerplate code until it is removed. **Don't build new product features on Supabase-specific APIs** (RLS-as-authz, PostgREST from the browser, Supabase Auth) |
 | PostHog is part of the stack | **Forbidden in product code.** Nothing may leave the customer's cell | Remove under D-07 |
 | Boilerplate rule: role checks may use Supabase `user_metadata.user_type` (`.cursor/rules/project-conventions.mdc`) | **Unsafe for authorization.** `user_metadata` can be edited by the signed-in user (`auth.updateUser`), so any role read from it can be self-granted. Roles must come from a server-controlled source (IdP groups, `app_metadata`, or our own table) | **Open, needs your OK** to change the boilerplate rule |
 | Server actions are the default mutation path | Fine for UI plumbing. **Access, sharing, and policy decisions never live in a server action**. They live in the policy engine | Applies now |
@@ -54,7 +54,7 @@ These rules come from the product's non-negotiables ([product rules](../../produ
 
 ## 5. Backend (Python) standards
 
-**Pending D-07.** If the Python API is adopted, this section will define the layout, typing (strict mypy/pyright), Pydantic boundaries, FastAPI dependency-injected auth, the DB access layer, migrations (Alembic), tests (pytest + property-based tests for policy), and tooling (uv, ruff). The security rules above apply in either case.
+**D-07 decided: Python API.** To be written: this section will define the layout, typing (strict mypy/pyright), Pydantic boundaries, FastAPI dependency-injected auth, the DB access layer, migrations (Alembic), tests (pytest + property-based tests for policy), and tooling (uv, ruff). The security rules above apply in either case.
 
 ## 6. Review
 

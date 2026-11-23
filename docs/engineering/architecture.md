@@ -7,7 +7,7 @@ Diagrams are plain text, so they render everywhere.
 **Contents**
 1. Big picture · 2. Inside a cell · 3. Question flow · 4. Answer ladder · 5. LLM providers (BYO key) · 6. PM review loop · 7. Context and data model · 8. Integrations and MCP · 9. Identity and access control · 10. Feature control and customization · 11. Billing and licensing · 12. Privacy · 13. Security · 14. Deployment and hosting · 15. Scaling · 16. Stack and repo
 
-**Glossary:** **Cell** = one customer's private, complete installation. **Owner** = the PM Kanwal covers for. **Asker** = the colleague asking. **Tier** = a step on the answer ladder. **Gate** = an access check. **Control plane** = Bullah Labs' central services (billing, licenses, releases). **It never holds customer content.**
+**Glossary:** **Customer** = the PM: they sign up, pay, and own their workspace and data. **Cell** = one company's private, complete installation, holding only that company's PMs. **Workspace** = one PM's isolated space inside a cell. **Owner** = the PM Kanwal covers for. **Asker** = the colleague asking. **Tier** = a step on the answer ladder. **Gate** = an access check. **Control plane** = Bullah Labs' central services (billing, licenses, releases). **It never holds customer content.**
 
 ---
 
@@ -22,19 +22,22 @@ Two halves, deliberately separated:
  │  Holds: accounts, plans, seats, invoices, cell IDs, versions, health.     │
  │  NEVER holds: questions, answers, documents, tokens, chats.               │
  └───────────────┬──────────────────────┬──────────────────────┬─────────────┘
-     signed license + releases   signed license + releases   deploy/upgrade + license
+     signed license + releases   deploy/upgrade + license    signed license + releases
                  ▼                      ▼                      ▼
- ┌─ Cell: Customer A ──────┐ ┌─ Cell: Customer B ──────┐ ┌─ Cell: Customer C ───────┐
+ ┌─ Cell: Company A ───────┐ ┌─ Cell: Company B ───────┐ ┌─ Cell: Company C ────────┐
  │ app · DB A · model · key│ │ app · DB B · model · key│ │ app · DB C · model · key │
- │ on THEIR servers        │ │ in THEIR AWS account    │ │ dedicated server WE rent │
- │ (local)                 │ │ (private-cloud)         │ │ for C only (managed)     │
+ │ in THEIR cloud account  │ │ dedicated server WE rent│ │ on THEIR servers         │
+ │ (private-cloud, v0)     │ │ for B only (managed, v0)│ │ (local, v1+)             │
  └─────────────────────────┘ └─────────────────────────┘ └──────────────────────────┘
             ✗ no network path, no shared DB, no shared key between cells
 ```
 
-- **Isolation level: the whole stack per customer.** Not a shared DB with a `tenant_id`, not a schema per tenant. That holds the privacy promise without asterisks, and the blast radius is one customer.
+- **Isolation level: the whole stack per company.** Not a shared DB with a `tenant_id`, not a schema per tenant. That holds the privacy promise without asterisks, and the blast radius is one company.
+- **The customer is the PM (D-39).** Each PM has an isolated **workspace** in their company's cell: own encryption key, own chats, rules, review inbox, verified answers and billing seat. Nothing crosses between PMs unless the PM shares it. PMs from the same company share the cell because they share its sources, sign-in and IT. A PM never shares a cell with another company.
 - **Scale out** = more cells, provisioned automatically. **Scale up** = more replicas or GPUs inside a cell.
 - **Same signed images everywhere.** Docker is the packaging; the hosting options are in §14.
+- **Cloud first (D-32).** v0 cells run in the customer's cloud account or on a dedicated server we rent. On-prem (`local`) comes in v1+. To keep that open, the core uses **no cloud-only services** (no Lambda, SQS, Cognito, managed vector DBs): only containers + Postgres.
+- **Hybrid sources.** A cloud cell reaches on-prem tools (e.g. Atlassian Data Center) through a **connector relay** inside the customer network (§8.4), never by opening inbound ports.
 
 ## 2. Inside a cell
 
@@ -66,6 +69,8 @@ Two halves, deliberately separated:
           │ (only if IT enabled a BYO provider)  │
           ▼                                      ▼
    Anthropic / OpenAI API               Jira · Confluence · Slack · Linear · MCP servers
+                                         (cloud tools direct · on-prem tools via the
+                                          connector relay in the customer network, §8.4)
 ```
 
 | Component | Decides access? | Notes |
@@ -77,6 +82,8 @@ Two halves, deliberately separated:
 | Model / external LLM | **Never** | Sees only pre-approved text. Has no tools in v0 |
 | Tool broker + MCP gateway | No (enforces policy) | Runs calls **as the asker**. Holds tokens. Sandboxes servers |
 | Worker | No | Postgres-backed queue (`SKIP LOCKED`). No Redis in v0 |
+| LLM gateway process | No | Separate process: the only one holding LLM API keys and allowed to call external providers |
+| Connector relay | No | Small agent inside the customer network. Outbound-only mTLS tunnel to the cell. Forwards only calls the broker approved (§8.4) |
 
 ## 3. Question flow (end to end)
 
@@ -202,6 +209,7 @@ Routing is configurable per project: which tiers are enabled, the thresholds, an
 
 Rules:
 - **Default is local only.** External providers are off until IT enables them. The `local` profile can forbid them outright.
+- **Development only: third-party gateways (e.g. OpenRouter)** may be used with **synthetic data only**, to shortlist models. Production can't reach them: not in the provider registry, not on the egress allow-list, and a CI check fails any production config that names one.
 - **Per-project `local-only` flag.** Sensitive projects never leave the cell, whatever the routing says.
 - **Disclosure:** answers produced by an external provider carry "AI: \<provider\>" in the PM's view and in the audit. "What Kanwal knows" lists *data leaves your network to: \<provider\>*.
 - **Key handling:** keys are written once through the IT console → vault (envelope-encrypted). Only the LLM gateway can use them, in memory. They're rotatable, and revocation is immediate. A key validation call happens at save time.
@@ -297,10 +305,21 @@ class Connector(Protocol):                       # sketch
 
 `AskerContext` is created only by the policy engine. It carries the identity plus a **token handle**, never the token.
 
+**Company-wide connection (v0, read-only):** IT sets it up in the IT console with a dedicated service account (e.g. `kanwal-svc`) holding **read access only** to the spaces/projects IT puts in scope (DC: personal access token or an OAuth app link). The token goes into the vault and is never shown again. Each Owner then picks what to share within that scope (Gate 2). **No writes in v0.** From v1, writes (comment, create ticket) are proposals approved per exact call; destructive tools stay off.
+
 **Per-source access rules:**
-- **Jira/Confluence:** the asker's own OAuth or PAT is used for the live check (Confluence DC is a week-1 spike, D-03).
+- **Jira/Confluence (pilot: Data Center, D-03):** Gate 1 must answer "can *this asker* see this item?". Option 1: the service account calls DC's permission-check-for-user APIs, so users connect nothing (week-1 spike, D-36). Option 2 (fallback, and always on Atlassian Cloud): each user connects their own account once via OAuth, read scope only. Their token is envelope-encrypted with a per-user key wrapped by the cell key, used only by the gateway, never logged, and deleted at offboarding.
 - **Slack as a source:** only the channels IT or the PM selected. Asker must be a member of the channel (checked live). Private channels only if the asker is a member. DMs never.
 - **MCP:** the call runs as the asker, so the tool enforces its own permissions.
+
+**Sync (native adapters):**
+
+| What | How |
+|------|-----|
+| New and changed items | DC webhooks for instant updates, plus an incremental poll every 5 min by `updated`/`lastmodified` ≥ cursor (JQL / CQL) |
+| Deletions | Nightly reconciliation: list all IDs in scope and diff against the index, since deletes never appear as updates. Missing ⇒ row purged |
+| Newly restricted items | Permission changes are picked up by the nightly reconciliation, **but the index is never trusted for access**: Gate 1 checks live before retrieval and before send, so an item restricted a minute ago is already blocked |
+| Verified answers | Auto-invalidated when a cited source's version changes |
 
 **Slack as a channel:**
 - Uses Socket Mode, so there is no inbound port, which works on-prem.
@@ -345,9 +364,33 @@ IT adds server (URL or image@digest) → INSPECTED (list tools, hash every defin
 - Who picks calls: **v0 plain code only, read tools**. v1: the model may *propose* from a pre-filtered list, and the broker re-authorizes each call as untrusted.
 - **Adding a PM tool:** IT adds the MCP server, classifies the tools, sets scopes, and users connect once. A **connector pack** (ours or a partner's) bundles: the pinned server, a classification preset, the canonical mapping, heads-up rules, tests. It's signed, with its own feature key `connector.<tool>`.
 
+### 8.4 Connector relay (cloud cell ↔ on-prem tools)
+
+A cloud cell can't reach a tool behind the customer's firewall, such as Atlassian Data Center. The fix is a small relay inside the customer network:
+
+```
+ CUSTOMER NETWORK                                   CLOUD CELL (their account or ours)
+ ┌───────────────────────────────┐                 ┌──────────────────────────────────┐
+ │ Jira DC · Confluence DC       │                 │ Tool broker → connector adapter  │
+ │        ▲  (LAN, read-only)    │  outbound only  │            ▲                     │
+ │ [Connector relay] ────────────┼──mTLS tunnel───►│ Relay endpoint (pinned cert)     │
+ │  signed image, no inbound port│  443            │  accepts only this relay's cert  │
+ └───────────────────────────────┘                 └──────────────────────────────────┘
+```
+
+- **Outbound only.** The customer opens no inbound ports. The relay dials out to the cell on 443 with mutual TLS, using a per-relay certificate issued at install time.
+- **Dumb and narrow.** It forwards only broker-approved requests to an allow-list of hosts and paths (the configured Jira/Confluence base URLs). No shell, no other hosts, no storage of content or tokens on disk.
+- **Tokens stay in the cell vault.** They travel per request inside the tunnel and are never persisted by the relay.
+- **Fail closed.** Relay down ⇒ live ACL checks fail ⇒ nothing is sent, and the question goes to the PM.
+- **Alternative:** a site-to-site VPN, if the customer's IT prefers it (D-33). Confirm with the pilot's IT in week 1.
+
 ## 9. Identity and access control
 
-**Identity:** OIDC with the company IdP (Entra, Okta, Google). There are no local passwords. Slack users are mapped to IdP users (verified email, or Enterprise Grid SSO). SCIM or a login-time check deprovisions users and revokes every token and session.
+**Identity:** OIDC with the company IdP (Entra, Okta, Google) from day one. If the customer has no IdP, the cell ships **Keycloak** as its IdP (still OIDC, so one code path; TOTP mandatory). Kanwal itself stores no passwords. Slack users are mapped to IdP users (verified email, or Enterprise Grid SSO).
+
+- **User creation:** just-in-time at first sign-in, with the lowest role (Asker). IT assigns Owner/IT/Auditor roles by hand or via IdP group mapping. **SCIM in v1** for same-day deprovisioning; until then a login-time check plus a nightly IdP sync deprovision users and revoke every token and session.
+- **Sessions:** server-side in Postgres. Browser holds an `HttpOnly`, `Secure`, `SameSite` cookie only, plus a CSRF token. Idle timeout 8 h, absolute 12 h (configurable). Logout and deprovisioning revoke immediately. Sensitive actions (connector setup, policy changes, approvals) require re-authentication.
+- **MFA:** enforced by the IdP. The API checks the `amr`/`acr` claim for IT and Owner sign-ins and refuses if MFA wasn't used.
 
 **Roles:** Owner · Asker · IT admin · Auditor, plus persona packs. Roles come from **server-controlled sources only** (IdP groups or our tables). Never from user-editable metadata.
 
@@ -466,7 +509,7 @@ Every promise = **mechanism + proof**. No proof, no claim. (Patterns from the "P
 
 | # | Promise | Mechanism | Proof |
 |---|---------|-----------|-------|
-| P1 | Your data stays with you | A cell per customer. `local` is the default | Network diagram, egress script |
+| P1 | Your data stays with you | A cell per company, a workspace with its own key per PM (in your cloud account, a server dedicated to you, or later on-prem). Local models are the default | Network diagram, egress script |
 | P2 | Nothing leaves unless **you** choose | Egress deny. No telemetry, CDNs, or remote fonts. BYO LLM and remote MCP are IT opt-in and listed | Egress script, "data leaves your network to" page |
 | P3 | Never trained on | No training pipeline. Provider `data_terms` recorded. Training-on-input providers are banned | Contract + SBOM + provider registry |
 | P4 | You own it, you can take it | Open-format export (JSON/MD/CSV) for every type. Clean-exit uninstall | One-click export, uninstall check |
@@ -496,7 +539,7 @@ Assume the model **will** be fooled, and make that harmless. Untrusted: source c
 | T9 | Abuse / DoS / **cost blow-up on BYO key** | Rate limits, caps, bounded queues, provider budgets | Load + budget tests |
 | T10 | Supply chain | Pinned weights, lockfiles, SBOM, signed images | CI gate |
 | T11 | Session/auth attacks | OIDC+PKCE, short sessions, CSRF, no local passwords. Roles never from user-editable metadata | Pentest |
-| T12 | Cross-tenant leak | Cell per customer | Architecture |
+| T12 | Cross-company or cross-PM leak | Cell per company. Per-PM workspace keys, and every query scoped to the workspace by the policy engine | Architecture + cross-workspace access tests |
 | T13 | Telemetry leak | No third-party scripts. Runtime telemetry off | Egress script |
 | T14 | MCP tool poisoning | Default deny, IT review, scoped descriptions | Poisoned-description fixtures |
 | T15 | MCP rug pull | Hash pinning, auto-quarantine | Definition-change test |
@@ -510,6 +553,7 @@ Assume the model **will** be fooled, and make that harmless. Untrusted: source c
 | T23 | **Forged license / billing webhook** | Ed25519 license verified in the cell. Webhook signatures + idempotency + reconciliation | Forged-license and replay tests |
 | T24 | **Verified answer leaks to a new asker** | Re-run Gate 1 for each asker. Auto-invalidate on source change | Access test cases |
 | T25 | **Hallucinated or guessed answer presented as fact, or as the PM's view** | Answerability gate, claim-level verifier, final `unknown`, fixed DONT_KNOW text, no PM-voice phrasing, accuracy notice on every reply (§4.1) | Unanswerable and judgment questions in the eval → 100% DONT_KNOW |
+| T26 | **Compromised or abused connector relay** | Outbound-only, per-relay mTLS cert (revocable), host/path allow-list, no content or tokens on disk, signed image, fail closed | Pentest: relay can't reach unlisted hosts, rejects unsigned requests |
 
 Baseline: SSO, TLS everywhere, encryption at rest, encrypted backups, dependency scanning, egress deny. Before the first paid deployment: external pentest, vulnerability disclosure policy, CRA 24 h reporting runbook. 2027: ISO 27001 + SOC 2 Type II on one control set.
 
@@ -517,27 +561,52 @@ Baseline: SSO, TLS everywhere, encryption at rest, encrypted backups, dependency
 
 **Profiles** (same signed images. The profile sets *ceilings* that IT can only narrow):
 
-| | `local` | `private-cloud` | `managed` |
+**Order (D-32): cloud first.** v0 = `private-cloud` and `managed`. `local` (on-prem) = v1+, built from the same images.
+
+| | `private-cloud` | `managed` | `local` |
 |---|---|---|---|
-| Where | Customer servers | Customer AWS/Azure/GCP account | A dedicated cell we run (customer-owned account preferred, D-19) |
-| When | v0 | v1 | v2 (pilots possible earlier) |
-| Packaging | Docker Compose | Terraform + Helm | Terraform + Helm via the fleet manager |
-| DB | Postgres container, encrypted volume | Managed Postgres + pgvector, private endpoint | Per-cell managed Postgres or on-box, per-cell key |
-| Models | Local GPU | GPU pool, + BYO API if allowed | Per-cell GPU or "lite cell" with a hosted model, + BYO API if allowed |
-| BYO LLM / remote MCP | Off by default (can be hard-disabled) | IT opt-in, allow-listed | IT opt-in, allow-listed |
-| License | Offline file | File or pull | Pulled from the control plane |
-| Updates | Customer pulls a signed release | Customer pipeline | Canary rollout, agreed windows |
+| Where | Customer AWS/Azure/GCP account | A dedicated cell we run for one company (company-owned account preferred, D-19) | Customer servers |
+| When | **v0 (first pilot choice)** | **v0 (if the customer has no cloud account)** | v1+ |
+| Packaging | v0: Terraform + Docker Compose on one VM. v1: Terraform + Helm | Same, via the fleet manager | Docker Compose, offline installer (v1) |
+| DB | Postgres + pgvector (on-box encrypted disk in v0, managed with a private endpoint later) | Per-cell Postgres, per-cell key | Postgres container, encrypted volume |
+| Models | Per-cell GPU, + BYO API if allowed | Per-cell GPU or "lite cell" with a hosted model, + BYO API if allowed | Local GPU |
+| On-prem sources | Connector relay or VPN (§8.4) | Connector relay or VPN (§8.4) | Direct (LAN) |
+| BYO LLM / remote MCP | IT opt-in, allow-listed | IT opt-in, allow-listed | Off by default (can be hard-disabled) |
+| License | File or pull | Pulled from the control plane | Offline file |
+| Updates | Customer pipeline or our signed release | Canary rollout, agreed windows | Customer pulls a signed release |
 
-**Where cells run for customers without servers** (each option = separate machine/account, DB, key, backups per customer):
+**Environments:**
 
-| Option | Per customer | ~ Cost/month | Use for |
+| Stage | Where | Data |
+|-------|-------|------|
+| Development | Laptops (Docker Compose) for code. One **AWS EC2 GPU instance** (e.g. g6.xlarge, 24 GB L4) running the same Compose stack, billed hourly and stopped when idle, for model tests and prod-like behaviour | Synthetic only |
+| Staging | The same AWS instance built with the pilot's Terraform (prod-like: private subnet, security groups, encrypted EBS, KMS key, egress deny) | Synthetic only |
+| Pilot | **AWS**: the PM's company's own AWS account (preferred), or a separate AWS account we open for that company. Same Terraform + Compose, always-on GPU instance (D-05, D-18, D-34) | Real, under a DPA (D-35) |
+
+**If we host a cell holding customer data, we are a data processor (GDPR Art. 28).** Before real data lands: a DPA, a subprocessor list (Hetzner/AWS), a written list of technical and organisational measures, and a breach-notification runbook (D-35). If the account is the customer's, our support access still needs a DPA.
+
+**Where cells run for companies without servers** (each option = separate machine/account, DB, key, backups per company):
+
+| Option | Per company | ~ Cost/month | Use for |
 |--------|--------------|--------------|---------|
-| A. Dedicated GPU server (Hetzner EU) | Whole cell on one box, Postgres on an encrypted disk | ~€214 (GPU incl.) | **Pilots, SMB EU** |
-| B. AWS account per customer | VPC, RDS + pgvector, GPU instance, KMS key | ~$600–900 | Enterprise, regulated, US |
+| A. Dedicated GPU server (Hetzner EU) | Whole cell on one box, Postgres on an encrypted disk | ~€214 (GPU incl.) | Budget EU tier (single box, no managed DB or failover) |
+| B. AWS account per company | VPC, RDS Multi-AZ + pgvector, GPU instance, KMS key, PITR backups | ~$800–1,000 | **Default: pilots, enterprise, regulated, US** |
 | C. DigitalOcean droplet + managed DB | Droplet, DB cluster, VPC; hosted model | ~$50–100 | No-GPU "lite cell" tier |
 | D. Supabase project | DB only, no GPU, adds a third party | — | **Not for customer data.** Internal tools only |
 
 Cost figures are rough. Check current list prices.
+
+**Hetzner cell (option A, one dedicated server per company, no AWS):**
+
+| Layer | Control |
+|-------|---------|
+| Hardware | One dedicated GPU server per company (GEX-class, EU: Falkenstein / Nuremberg / Helsinki). **Never** two companies on one box, VM, or GPU |
+| Disk | Full-disk encryption (LUKS). Unlock key is not on the box (remote unlock at boot, or Tang/Clevis on our key server). Postgres on the encrypted disk with a per-cell DB key |
+| Network | Only 443 open (Hetzner firewall + host `nftables`). Egress deny except allow-listed connector/provider hosts. No shared vSwitch between companies |
+| Admin access | WireGuard only, SSH keys, no passwords, no standing access. Break-glass is logged and shown to the company |
+| Backups | Encrypted on the box (restic) with a per-company key, to a per-company Hetzner Storage Box or the company's own storage. Restore tested each release |
+| Provisioning | Hetzner Robot API + Ansible (Terraform covers Hetzner Cloud, which has no GPUs). Same signed images and Compose file as AWS |
+| Limits | No KMS, no managed DB, a single box (no HA): keep a spare-server runbook to hit RTO ≤ 4 h. Root on a box we run can in principle read memory, so P7 means "no standing access + audited break-glass", not "impossible" |
 
 **Release pipeline:**
 
@@ -569,22 +638,24 @@ Rule: design the seams now, and add infrastructure only when a metric demands it
 
 | Layer | Choice |
 |-------|--------|
-| Web | React + shadcn + Tailwind + React Query (Next.js static export or Vite, D-07). **No business logic in the web tier** |
-| Core API + worker | Python (FastAPI), Pydantic, SQLAlchemy/psycopg, Alembic, pytest + Hypothesis |
+| Web | Next.js + React + shadcn + Tailwind + React Query, from the boilerplate **minus Supabase and PostHog** (D-07). Talks to the API over HTTPS JSON with TypeScript types generated from the API's OpenAPI spec. Served behind the same origin as the API (reverse proxy), so the session cookie works without CORS. **No business logic or authorization in the web tier** |
+| Core API + worker | **Python 3.12 (decided, D-07)**, FastAPI, Pydantic, SQLAlchemy 2/psycopg, Alembic, uv, pytest + Hypothesis. One modular codebase, separate processes: `api`, `worker`, `llm-gateway`, `mcp-gateway` (v1) |
 | DB | PostgreSQL 16+ with pgvector |
 | Models | Ollama → vLLM. Shortlist tested in week 1 (Qwen3.5 9B / Ministral, 27B-class, gpt-oss-20b, BGE-M3 embeddings) |
 | Control plane | Separate service + DB (ours). Payment gateway via hosted checkout + webhooks |
-| Packaging | Docker Compose · Helm · Terraform · cosign |
+| Packaging | Terraform + Docker Compose (v0, cloud VM) · Helm (v1) · cosign |
 
 ```
 apps/web/              React UI
 apps/api/              policy · orchestrator · ladder · review · broker · capabilities · channels
 apps/worker/           same package, worker entrypoint
-apps/mcp-gateway/      separate container
+apps/llm-gateway/      same package, separate process (only holder of LLM keys)
+apps/mcp-gateway/      separate container (v1)
+apps/connector-relay/  tiny agent for on-prem sources (outbound mTLS, §8.4)
 packages/connectors/   jira/ confluence/ slack/ mcp/ (+ packs)
 packages/personas/     pm/
 control-plane/         billing · entitlements · license signer · releases · fleet (separate deploy)
-deploy/                compose/ helm/ terraform/ egress-proof/
+deploy/                terraform/ compose/ helm/ egress-proof/
 evals/                 quality-100 · access-50 · injection-30 · ladder thresholds
 docs/                  product/PRD.md · product/decisions.md · engineering/architecture.md · coding-standards/
 ```
